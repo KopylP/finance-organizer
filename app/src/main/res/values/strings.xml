@@ -1,0 +1,13 @@
+<resources>
+    <string name="app_name">Finance Organizer</string>
+    <string name="edit"><u>Edit</u></string>
+    <string name="apply"><u>Apply</u></string>
+    <string name="dialog_date_title">Select your date</string>
+    <string name="statistic">Your statistics</string>
+    <string name="current_day"><u>Current day</u></string>
+    <string name="enter_month_limit">Enter your month limit</string>
+    <string name="settings">Settings</string>
+    <string name="set"><u>Set</u></string>
+    <string name="remove">Remove</string>
+    <string name="save">Save</string>
+</resources>
