@@ -62,7 +62,8 @@
             android:layout_width="200dp"
             android:layout_height="200dp"
             android:layout_gravity="center_horizontal"
-            android:src="@drawable/ic_launcher_background"/>
+            android:src="@drawable/ic_launcher_background"
+            android:id="@+id/image_show"/>
     </FrameLayout>
     <FrameLayout
         android:layout_marginTop="10dp"

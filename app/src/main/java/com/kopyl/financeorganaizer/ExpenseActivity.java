@@ -2,12 +2,18 @@ package com.kopyl.financeorganaizer;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.BitmapFactory;
+import android.graphics.Point;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.squareup.picasso.Picasso;
+
+import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.UUID;
 
@@ -19,6 +25,7 @@ public class ExpenseActivity extends AppCompatActivity {
     private Expense mExpense;
     private TextView mViewDate;
     private Button mEditButton;
+    private ImageView mShowExpenseImage;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -28,6 +35,7 @@ public class ExpenseActivity extends AppCompatActivity {
         mExpenseCost = findViewById(R.id.expenseCostShow);
         mViewDate = findViewById(R.id.viewDate);
         mEditButton = findViewById(R.id.editButton);
+        mShowExpenseImage = findViewById(R.id.image_show);
 
         UUID uuid = UUID.fromString(getIntent().getStringExtra(UUID_EXTRA_KEY));
         mExpense = ExpenseLab.get(this).getExpense(uuid);
@@ -54,6 +62,17 @@ public class ExpenseActivity extends AppCompatActivity {
 
         SimpleDateFormat format = new SimpleDateFormat("dd MMMM yyyy hh:mm");
         mViewDate.setText(format.format(mExpense.getDate()));
+        File file = ExpenseLab.get(this).getFileDir(mExpense);
+
+        if(file.exists())
+            Picasso.with(this)
+                .load(file)
+                .fit()
+                .centerInside()
+                .into(mShowExpenseImage);
+        else
+            mShowExpenseImage.setVisibility(View.GONE);
+        //mShowExpenseImage.setImageBitmap(BitmapFactory.decodeFile(file.getPath()));
     }
     public static Intent newIntent(Context context, UUID uuid)
     {

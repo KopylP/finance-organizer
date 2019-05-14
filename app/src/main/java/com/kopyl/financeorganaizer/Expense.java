@@ -56,4 +56,8 @@ public class Expense {
     public void setComing(boolean coming) {
         mIsComing = coming;
     }
+
+    public String getFileName() {
+        return "IMG_" + mId.toString() + ".jpg";
+    }
 }

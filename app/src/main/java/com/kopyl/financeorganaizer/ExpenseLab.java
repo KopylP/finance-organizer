@@ -10,6 +10,7 @@ import com.kopyl.financeorganaizer.database.ExpenseBaseHelper;
 import com.kopyl.financeorganaizer.database.ExpenseDbSchema;
 import com.kopyl.financeorganaizer.database.ExpenseDbSchema.ExpenseTable.Cols;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -208,5 +209,11 @@ public class ExpenseLab {
                         + " = " + limit.getMonth() + " AND "
                         + ExpenseDbSchema.MonthLimitTable.Cols.YEAR
                         + " = " +  limit.getYear() , null);
+    }
+
+    public File getFileDir(Expense expense)
+    {
+        File curDir = mContext.getFilesDir();
+        return new File(curDir, expense.getFileName());
     }
 }
