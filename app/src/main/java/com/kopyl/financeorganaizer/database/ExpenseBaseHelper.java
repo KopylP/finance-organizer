@@ -17,7 +17,7 @@ import static com.kopyl.financeorganaizer.database.ExpenseDbSchema.*;
 
 public class ExpenseBaseHelper extends SQLiteOpenHelper {
     public ExpenseBaseHelper(@Nullable Context context) {
-        super(context,ExpenseTable.NAME,null,1);
+        super(context,ExpenseTable.NAME,null,2);
     }
 
     @Override
@@ -70,6 +70,16 @@ public class ExpenseBaseHelper extends SQLiteOpenHelper {
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+        switch (oldVersion){
+            case 1:
+                String SQL = "CREATE TABLE " + MonthLimitTable.NAME + " ("
+                        + " id integer primary key autoincrement, " +
+                        MonthLimitTable.Cols.MONTH + ", " +
+                        MonthLimitTable.Cols.YEAR + ", "  +
+                        MonthLimitTable.Cols.LIMIT + ")";
 
+                db.execSQL(SQL);
+                break;
+        }
     }
 }

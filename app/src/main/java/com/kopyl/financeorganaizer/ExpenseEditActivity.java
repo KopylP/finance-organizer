@@ -18,6 +18,7 @@ import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import com.squareup.picasso.Picasso;
 
@@ -80,9 +81,14 @@ public class ExpenseEditActivity extends AppCompatActivity {
         mApplyButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mExpense.setCost(Double.valueOf(mEditCost.getText().toString()));
-                mExpense.setName(mEditName.getText().toString());
-                mExpense.setComing(mComingBox.isChecked());
+                try {
+                    mExpense.setCost(Double.valueOf(mEditCost.getText().toString()));
+                    mExpense.setName(mEditName.getText().toString());
+                    mExpense.setComing(mComingBox.isChecked());
+                }
+                catch (Exception ex) {
+                    Toast.makeText(ExpenseEditActivity.this, "Enter the correct values", Toast.LENGTH_SHORT).show();
+                }
                 if(isEdit)
                 {
                     ExpenseLab.get(ExpenseEditActivity.this).updateExpense(mExpense);

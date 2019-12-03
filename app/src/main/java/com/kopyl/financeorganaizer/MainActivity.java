@@ -40,8 +40,8 @@ public class MainActivity extends AppCompatActivity implements ExpensesDateDialo
     private TextView mViewCostPerMonth;
     private TextView mViewCostPerDay;
     private TextView mViewIncPerMonth;
-    private TextView mViewExpPerDay;
-    private TextView mViewExpOnStartDay;
+    //private TextView mViewExpPerDay;
+    //private TextView mViewExpOnStartDay;
     private TextView mViewLimPerNextDays;
 
     @Override
@@ -55,11 +55,11 @@ public class MainActivity extends AppCompatActivity implements ExpensesDateDialo
 
         mCurrentDateButton = findViewById(R.id.current_date_button);
 
-        mViewExpPerDay = findViewById(R.id.viewExPerDay);
+        //mViewExpPerDay = findViewById(R.id.viewExPerDay);
         mViewIncPerMonth = findViewById(R.id.viewIncPerMonth);
         mViewCostPerMonth = findViewById(R.id.viewCostPerMonth);
         mViewCostPerDay = findViewById(R.id.viewCostPerDay);
-        mViewExpOnStartDay = findViewById(R.id.viewExpOnStartDay);
+        //mViewExpOnStartDay = findViewById(R.id.viewExpOnStartDay);
         mViewLimPerNextDays = findViewById(R.id.viewLimPerNextDays);
 
         mAddExpense.setOnClickListener(new View.OnClickListener() {
@@ -86,7 +86,7 @@ public class MainActivity extends AppCompatActivity implements ExpensesDateDialo
 
     @Override
     public void selected(Date date) {
-        Intent intent = ExpensePagerActivity.newIntent(MainActivity.this,date);
+        Intent intent = ExpensePagerActivity.newIntent(MainActivity.this, date);
         startActivity(intent);
     }
 
@@ -105,6 +105,7 @@ public class MainActivity extends AppCompatActivity implements ExpensesDateDialo
 
                 ExpensesDateDialog dialog = new ExpensesDateDialog();
                 dialog.show(fragmentManager, DATE_DIALOG);
+                break;
             case R.id.setting:
                 Intent intent = new Intent(this, SettingsActivity.class);
                 startActivity(intent);
@@ -123,39 +124,51 @@ public class MainActivity extends AppCompatActivity implements ExpensesDateDialo
         incPerMonth = Math.round(incPerMonth * 100.0) / 100.0;
         costPerMonth = Math.round(costPerMonth * 100.0) / 100.0;
         costPerDay = Math.round(costPerDay * 100.0) / 100.0;
-        exPerDay = Math.round(exPerDay * 100.0) / 100.0;
+        //exPerDay = Math.round(exPerDay * 100.0) / 100.0;
 
 
 
         SharedPreferences preferences = getSharedPreferences(PREFERENCES, Context.MODE_PRIVATE);
-        Date date = DateTime.getZeroTimedDate(new Date());
+        //Date date = DateTime.getZeroTimedDate(new Date());
 
 
-        String valueStr = preferences.getString(date.toString(), "");
-        double value;
-        if(valueStr.equals("")) {
+        //String valueStr = preferences.getString(date.toString(), "");
+        //double value;
+        //if(valueStr.equals("")) {
 
+            //preferences.edit().clear();
+            //preferences.edit().putString(date.toString(), Double.toString(exPerDay)).apply();
+            //mViewExpOnStartDay.setText("");
+            //value = exPerDay;
+        //}
+       // else {
+           // value = Double.parseDouble(valueStr);
+        /*TODO*/
+        double coming = Statistics.getComingPerDay(this);
+        Double exOnStartDay;
+        if(coming == 0 && costPerDay == 0) {
             preferences.edit().clear();
-            preferences.edit().putString(date.toString(), Double.toString(exPerDay)).apply();
-            mViewExpOnStartDay.setText("");
-            value = exPerDay;
+            preferences.edit().putFloat("value", (float)exPerDay).apply();
+            exOnStartDay = exPerDay;
         }
         else {
-            value = Double.parseDouble(valueStr);
-
-
-            mViewExpOnStartDay.setText(Double.toString(value));
+            exOnStartDay = (double)preferences.getFloat("value", (float)exPerDay);
+            exPerDay = exOnStartDay + coming - costPerDay;
         }
-        double coming = Statistics.getComingPerDay(this);
-        exPerDay = value - costPerDay + coming;
-        mViewExpPerDay.setText(Double.toString(exPerDay));
-        if(exPerDay > 0) mViewExpPerDay
-                .setTextColor(getResources().getColor(R.color.colorGreen, getTheme()));
-        else mViewExpPerDay
-                .setTextColor(getResources().getColor(R.color.colorPrimary, getTheme()));
+        exPerDay = Math.round(exPerDay * 100.0) / 100.0;
+        exOnStartDay = Math.round(exOnStartDay * 100.0) / 100.0;
+        //mViewExpOnStartDay.setText(Double.toString(Math.round(exOnStartDay * 100.0) / 100.0));
+
+        //mViewExpPerDay.setText(Double.toString(Math.round(exPerDay * 100.0) / 100.0));
+//        if(exPerDay > 0) mViewExpPerDay
+//                .setTextColor(getResources().getColor(R.color.colorGreen, getTheme()));
+//        else mViewExpPerDay
+//                .setTextColor(getResources().getColor(R.color.colorPrimary, getTheme()));
 
 
         exPerDay = Statistics.getExpectedExpensePerDay(this, 1);
+        exPerDay = Math.round(exPerDay * 100.0) / 100.0;
+
         mViewIncPerMonth.setText(Double.toString(incPerMonth));
         mViewCostPerMonth.setText(Double.toString(costPerMonth));
         mViewCostPerDay.setText(Double.toString(costPerDay));
@@ -170,13 +183,14 @@ public class MainActivity extends AppCompatActivity implements ExpensesDateDialo
     }
 
     void checkMonthLimit() {
-        List<MonthLimit> limits = ExpenseLab.get(this).getMonthLimits();
-        if(limits.size() == 0)
+        MonthLimit limit = ExpenseLab.get(this).getLastMonthLimit();
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(new Date());
+        int year = calendar.get(Calendar.YEAR);
+        int month = calendar.get(Calendar.MONTH);
+        if(limit == null || (year > limit.getYear() && month > limit.getMonth()))
         {
-            Calendar calendar = Calendar.getInstance();
-            calendar.setTime(new Date());
-            int month = calendar.get(Calendar.MONTH);
-            int year = calendar.get(Calendar.YEAR);
+
             FragmentManager fragmentManager = getSupportFragmentManager();
 
             LimitPerMonthDialog dialog = LimitPerMonthDialog.newInstance(month, year);

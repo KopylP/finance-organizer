@@ -46,8 +46,12 @@ public class ExpensesDateDialog extends DialogFragment {
                         calendar.set(Calendar.YEAR, mDatePicker.getYear());
                         calendar.set(Calendar.MONTH, mDatePicker.getMonth());
                         calendar.set(Calendar.DAY_OF_MONTH, mDatePicker.getDayOfMonth());
-                        Date date = DateTime.getZeroTimedDate(calendar.getTime());
-                        mCallbacks.selected(date);
+                        calendar.set(Calendar.HOUR, 0);
+                        calendar.set(Calendar.MINUTE, 0);
+                        calendar.set(Calendar.SECOND, 0);
+                        calendar.set(Calendar.MILLISECOND, 0);
+                        //Date date = DateTime.getZeroTimedDate(calendar.getTime());
+                        mCallbacks.selected(calendar.getTime());
                     }
                 })
                 .setNegativeButton("Cencel", null)

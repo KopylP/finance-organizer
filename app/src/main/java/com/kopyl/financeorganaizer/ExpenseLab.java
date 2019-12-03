@@ -181,11 +181,12 @@ public class ExpenseLab {
 
     public MonthLimit getLastMonthLimit()
     {
+        /* TODO */
         MonthLimitCursorWrapper cursor = queryManthLimit(null, null);
         MonthLimit limit = null;
         try{
-            cursor.moveToLast();
-            limit = cursor.getMonthLimit();
+            if(cursor.moveToLast())
+                limit = cursor.getMonthLimit();
         }
         finally {
             cursor.close();

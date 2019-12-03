@@ -48,6 +48,13 @@ public class ExpenseActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
+
+
+        mShowExpenseImage.setOnClickListener(p -> {
+            Intent intent = ExpensePhotoViewActivity
+                    .newInstance(mExpense.getId(), ExpenseActivity.this);
+            startActivity(intent);
+        });
     }
 
     void bind()
@@ -64,12 +71,14 @@ public class ExpenseActivity extends AppCompatActivity {
         mViewDate.setText(format.format(mExpense.getDate()));
         File file = ExpenseLab.get(this).getFileDir(mExpense);
 
-        if(file.exists())
+        if(file.exists()) {
+            mShowExpenseImage.setVisibility(View.VISIBLE);
             Picasso.with(this)
-                .load(file)
-                .fit()
-                .centerInside()
-                .into(mShowExpenseImage);
+                    .load(file)
+                    .fit()
+                    .centerInside()
+                    .into(mShowExpenseImage);
+        }
         else
             mShowExpenseImage.setVisibility(View.GONE);
         //mShowExpenseImage.setImageBitmap(BitmapFactory.decodeFile(file.getPath()));

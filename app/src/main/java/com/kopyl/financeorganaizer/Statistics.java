@@ -34,6 +34,7 @@ public class Statistics {
 
         calendar.setTime(new Date());
         double days = calendar.getActualMaximum(Calendar.DAY_OF_MONTH) - calendar.get(Calendar.DAY_OF_MONTH) - i;
+        if(days < 0) days = 1;
         return (allLimits + allComing - allCosts)/days;
     }
 

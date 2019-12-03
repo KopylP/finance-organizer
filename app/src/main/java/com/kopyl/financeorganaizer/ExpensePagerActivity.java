@@ -1,7 +1,9 @@
 package com.kopyl.financeorganaizer;
 
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
@@ -15,6 +17,7 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.kopyl.financeorganaizer.Services.ExpenseSlideService;
 import com.kopyl.financeorganaizer.fragments.ExpenseListFragment;
 
 import java.text.SimpleDateFormat;
@@ -58,14 +61,17 @@ public class ExpensePagerActivity extends AppCompatActivity {
     private TextView mNextDate;
     private ExpensePagerAdapter mAdapter;
     private static final String DATE_EXTRA = "com.kopyl.financeogranizer.date_extra";
-    private SimpleDateFormat format = new  SimpleDateFormat("dd MMMM yyyy");
-    private SimpleDateFormat litleFormat = new SimpleDateFormat("dd MMM. yyyy");
+    private SimpleDateFormat format = new  SimpleDateFormat("dd MMM. yyyy");
+    private SimpleDateFormat littleFormat = new SimpleDateFormat("dd MMM. yyyy");
+
+    private boolean mIsServiceEnabled = false;
+    private Intent mServiceIntent;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         mSelectedDate = new Date();
         mSelectedDate.setTime(getIntent().getLongExtra(DATE_EXTRA, 0));
+
 
         setContentView(R.layout.activity_expense_pager);
 
@@ -104,7 +110,7 @@ public class ExpensePagerActivity extends AppCompatActivity {
         }
         if(i == mDates.size())
         {
-            mExpensePager.setCurrentItem(0);
+            //mExpensePager.setCurrentItem(0);
             Toast.makeText(this, "No Expenses in this date", Toast.LENGTH_SHORT).show();
             finish();
         }
@@ -129,15 +135,22 @@ public class ExpensePagerActivity extends AppCompatActivity {
             }
         });
         //makeRemoved(true);
+
+        mDateTextView.setOnClickListener(p->{
+            if(!mIsServiceEnabled)
+                mServiceIntent = ExpenseSlideService.startActionSlide(ExpensePagerActivity.this, mExpensePager.getAdapter().getCount());
+            else
+                ExpenseSlideService.stopActionSlide(ExpensePagerActivity.this, mServiceIntent);
+            mIsServiceEnabled = !mIsServiceEnabled;
+        });
     }
-    public static Intent newIntent(Context context, Date date)
-    {
+
+    public static Intent newIntent(Context context, Date date) {
         Intent intent = new Intent(context, ExpensePagerActivity.class);
         intent.putExtra(DATE_EXTRA, date.getTime());
         return intent;
     }
-    private void culcDateViews()
-    {
+    private void culcDateViews() {
         mSelectedDate = mDates.get( mExpensePager.getCurrentItem() );
         mDateTextView.setText(format.format(mSelectedDate));
         int prevInd  = mExpensePager.getCurrentItem() - 1;
@@ -149,7 +162,7 @@ public class ExpensePagerActivity extends AppCompatActivity {
         }
         else
         {
-            mPrevDate.setText("< " + litleFormat.format(mDates.get(prevInd)));
+            mPrevDate.setText("< " + littleFormat.format(mDates.get(prevInd)));
         }
         if(nextInd == mDates.size())
         {
@@ -157,8 +170,32 @@ public class ExpensePagerActivity extends AppCompatActivity {
         }
         else
         {
-            mNextDate.setText(litleFormat.format(mDates.get(nextInd)) + " >");
+            mNextDate.setText(littleFormat.format(mDates.get(nextInd)) + " >");
         }
     }
 
+    private BroadcastReceiver mReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if(intent.getStringExtra(ExpenseSlideService.EXTRA_OUT_STOP) == null) {
+                int currentItem = (mExpensePager.getCurrentItem() + 1) % mExpensePager.getAdapter().getCount();
+                mExpensePager.setCurrentItem(currentItem);
+            }
+            else {
+                mIsServiceEnabled = false;
+            }
+        }
+    };
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        registerReceiver(mReceiver, new IntentFilter(ExpenseSlideService.INTENT_FILTER_ID_1));
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        unregisterReceiver(mReceiver);
+    }
 }
